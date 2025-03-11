@@ -59,184 +59,199 @@ On the right you should see a new tab with the filename you provided as its name
 
 Paste the code below into the new editor window:
 
-"""  
-   JackBord\_Mqtt\_Receiver.py
+```python
+"""
+    JackBord_Mqtt_Receiver.py
 
-   11 March 2025 \> This is for use with the JackBord BASIC, PRO or Virtual.
+    11 March 2025 > This is for use with the JackBord BASIC, PRO or Virtual.
 
-       It connects to the JackBord MQTT Server using your JackBords profile credentials  
-       and listens to the PID/\# mqtt topic for data from your JackBord.
+        It connects to the JackBord MQTT Server using your JackBords profile credentials
+        and listens to the PID/# mqtt topic for data from your JackBord.
 
-       Where PID is the JackBords dashboard profile ID.  
-       Mqtt messages sent to and from the JackBord are visable in the terminal.
+        Where PID is the JackBords dashboard profile ID.
+        Mqtt messages sent to and from the JackBord are visable in the terminal.
 
-   NOTE: You need to get the unique credentials for your JackBord as stated  
-           in the repository readme.  
-"""  
-from datetime import datetime, timedelta  
-import paho.mqtt.client as mqtt  
-import uuid  
-import ssl  
-import time  
+    NOTE: You need to get the unique credentials for your JackBord as stated 
+            in the repository readme.
+"""
+from datetime import datetime, timedelta
+import paho.mqtt.client as mqtt
+import uuid
+import ssl
+import time
 import re
 
-\# MQTT broker configuration \>\>\>\>\>\>\>\>\>  
-dest\_broker \= "wsa.jackbord.org"  
-dest\_port \= 443  \# Secure WSS port
 
-"""  
-MQTT Credentials from the Dashboard. \>\>\>\>\>\>\>\>\>  
-   eg  from the JB BASIC Helper page URL:  
-       https://jb.works/basic?pid=Your pid\&qtid=your id\&pw=your pw&  
-"""  
-jb\_pid \= "your pid"  
-jb\_username \= "your id"  
-jb\_password \= "your pw"
+# MQTT broker configuration 
+dest_broker = "wsa.jackbord.org"
+dest_port = 443  # Secure WSS port
 
-\# My Virtual JackBord  
-jb\_pid \= "10GT"  
-jb\_username \= "113568327219567611054"  
-jb\_password \= "176642e451"
+"""
+MQTT Credentials from the Dashboard. 
+    eg  from the JB BASIC Helper page URL:
+        https://jb.works/basic?pid=Your pid&qtid=your id&pw=your pw&
+"""
+jb_pid = "your pid"
+jb_username = "your id"
+jb_password = "your pw"
 
-"""  
-   JackBord MQTT Topics  
-       We will subscribe to these topics.  
-"""  
-\# JackBord Command Topic \> Send commands to this topic.  
-jb\_cmd\_topic \= jb\_pid \+ "/cmd"
+# My Virtual JackBord
+jb_pid = "10GT"
+jb_username = "113568327219567611054"
+jb_password = "176642e451"
 
-\# jprint Topic \> Has print output from the command line.  
-jprint\_topic \= jb\_pid \+ "/jprint"
+"""
+    JackBord MQTT Topics 
+        We will subscribe to these topics.
+"""
+# JackBord Command Topic: Send commands to this topic.
+jb_cmd_topic = jb_pid + "/cmd"
 
-\# data Topic \> Has the state of the pins.  
-data\_topic \= jb\_pid \+ "/data"
+# jprint Topic: Has print output from the command line.
+jprint_topic = jb_pid + "/jprint"
 
-\# po Topic \> Shows the output of your program in the Print Tab.  
-po\_topic \= jb\_pid \+ "/po"
+# data Topic: Has the state of the pins.
+data_topic = jb_pid + "/data"
 
-\# List to store new messages \>\>\>\>\>\>\>\>\>\>\>\>  
-message\_queue \= \[\]
+# po Topic: Shows the output of your program in the Print Tab.
+po_topic = jb_pid + "/po"
 
-\# Message to send when our program stops.  
-exitprog\_message \= "exitprog"
 
-"""  
-   Setup the MQTT Server Connection  
-"""  
-\# Define the callback function for connection  
-def on\_connect(client, userdata, flags, rc):  
-   if rc \== 0:  
-       print("Connected to broker, on standby")
 
-       \# Subscribe the JackBord Topics \>\>\>\>\>\>\>\>  
-       client.subscribe(jb\_cmd\_topic)  
-       client.subscribe(jprint\_topic)  
-       client.subscribe(data\_topic)  
-       client.subscribe(po\_topic)
+# List to store new messages 
+message_queue = []
 
-       print(f"Subscribed to topics.")
+# Message to send when our program stops.
+exitprog_message = "exitprog"
 
-       \# Send a hi command to the JB when we connect  
-       send\_jb\_command("hi")
+"""
+    Setup the MQTT Server Connection
+"""
+# Define the callback function for connection
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print("Connected to broker, on standby")
 
-   else:  
-       print(f"Connection failed with code {rc}")
+        # Subscribe the JackBord Topics 
+        client.subscribe(jb_cmd_topic)
+        client.subscribe(jprint_topic)
+        client.subscribe(data_topic)
+        client.subscribe(po_topic)
 
-"""  
-   Get New MQTT Messages \>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>  
-       This function is called when a new mqtt message is received.  
-       To keep things fast it will add the new message to a  
-       message que list variable called message\_queue and exit.  
-       We will deal with the new messages later.  
-"""  
-def on\_message(client, userdata, msg):
 
-   \# Declare as global variable  
-   global message\_counter
+        print(f"Subscribed to topics.")
 
-   \# Decode the message payload \>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>  
-   message \= msg.payload.decode('utf-8')
+        # Send a hi command to the JB when we connect
+        send_jb_command("hi")
 
-   \# Display the new message from the JackBord \>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>  
-   print(f"NEW\>{message\_counter}\> Topic \[{msg.topic}\]\\nMessage \[{message}\]")
+    else:
+        print(f"Connection failed with code {rc}")
 
-   \# Append the new message to the message queue \>\>\>\>\>\>\>\>\>\>\>\>\>\>\>\>  
-   message\_queue.append(message)
 
-   \# Inc the message\_counter  
-   message\_counter \+= 1
+"""
+    Get New MQTT Messages 
+        This function is called when a new mqtt message is received.
+        To keep things fast it will add the new message to a
+        message que list variable called message_queue and exit.
+        We will deal with the new messages later.
+"""
+def on_message(client, userdata, msg):
 
-\# Define the callback function for disconnection  
-def on\_disconnect(client, userdata, rc):  
-   print("Disconnected from broker")
+    # Declare as global variable
+    global message_counter
 
-\# Send a New Command to the cmd topic \>\>\>\>\>\>\>  
-def send\_jb\_command( command ):  
+    # Decode the message payload 
+    message = msg.payload.decode('utf-8')
+
+    # Display the new message from the JackBord 
+    print(f"NEW>{message_counter}> Topic [{msg.topic}]\nMessage [{message}]")
+
+    # Append the new message to the message queue 
+    message_queue.append(message)
+
+    # Inc the message_counter
+    message_counter += 1
+
+# Define the callback function for disconnection
+def on_disconnect(client, userdata, rc):
+    print("Disconnected from broker")
+
+
+
+# Send a New Command to the cmd topic 
+def send_jb_command( command ):
     
-   print(f"Send comamnd \[{command}\]")
+    print(f"Send comamnd [{command}]")
 
-   \# Publish the command to the /cmd topic \>\>\>\>\>\>\>\>\>\>  
-   client.publish(jb\_cmd\_topic, command)
+    # Publish the command to the /cmd topic >
+    client.publish(jb_cmd_topic, command)
 
-\# Connect to the MQTT Server \>\>\>\>\>\>\>\>\>\>\>\>  
-\# Create an MQTT client instance  
-client\_id \= str(uuid.uuid4())  
-client \= mqtt.Client(client\_id\=client\_id, transport\='websockets', protocol\=mqtt.MQTTv311)
 
-\# Set username and password  
-client.username\_pw\_set(jb\_username, jb\_password)
 
-\# Assign the on\_connect and on\_disconnect callback functions  
-client.on\_connect \= on\_connect  
-client.on\_disconnect \= on\_disconnect  
-client.on\_message \= on\_message
+# Connect to the MQTT Server  
+# Create an MQTT client instance
+client_id = str(uuid.uuid4())
+client = mqtt.Client(client_id=client_id, transport='websockets', protocol=mqtt.MQTTv311)
 
-\# Configure SSL/TLS  
-ssl\_context \= ssl.create\_default\_context()  
-client.tls\_set\_context(ssl\_context)
+# Set username and password
+client.username_pw_set(jb_username, jb_password)
 
-\# Connect to the broker using WSS  
-client.ws\_set\_options(path\="/mqtt")
+# Assign the on_connect and on_disconnect callback functions
+client.on_connect = on_connect
+client.on_disconnect = on_disconnect
+client.on_message = on_message
 
-\# if the server uses a self-signed certificate, use this line carefully  
-client.tls\_insecure\_set(True)
+# Configure SSL/TLS
+ssl_context = ssl.create_default_context()
+client.tls_set_context(ssl_context)
 
-\# Start the MQTT client loop  
-client.connect(dest\_broker, dest\_port)  
-client.loop\_start()
+# Connect to the broker using WSS
+client.ws_set_options(path="/mqtt")
 
-\# Message Counter \> Tracks the number of messges we received.  
-message\_counter \= 0
+# if the server uses a self-signed certificate, use this line carefully
+client.tls_insecure_set(True)
 
-\# Wait for New MQTT Messages in a loop \>\>\>\>\>\>\>\>\>\>  
-try:  
-   while True:
+# Start the MQTT client loop
+client.connect(dest_broker, dest_port)
+client.loop_start()
 
-       \# Process new MQTT messages on the message\_queue  
-       while message\_queue:
+# Message Counter: Tracks the number of messges we received.
+message_counter = 0
 
-           \# Get the first message in the queue  
-           new\_message \= message\_queue.pop(0)  
-           \# print(f"Process message: \[{new\_message}\]")
+# Wait for New MQTT Messages in a loop 
+try:
+    while True:
 
-           \# Add any additional processing logic here \>\>\>\>\>
+        # Process new MQTT messages on the message_queue
+        while message_queue:
 
-       \# Do other stuff in the main prog loop.  
-       print(f'Message count \[{message\_counter}\]')
+            # Get the first message in the queue
+            new_message = message_queue.pop(0)
+            # print(f"Process message: [{new_message}]")
 
-       \# Delay so we dont load the system too much.  
-       time.sleep(1)
+            # Add any additional processing logic here 
 
-\# Exit the program Loop. \>\>\>\>\>\>\>\>\>\>\>\>\>  
-except KeyboardInterrupt:  
-   print("Exiting program. Good bye")
+        # Do other stuff in the main prog loop.
+        print(f'Message count [{message_counter}]')
 
-\# Send a final command to the JB before we disconnect.  
-send\_jb\_command(exitprog\_message)
+        # Delay so we dont load the system too much.
+        time.sleep(1)
 
-\# Stop the MQTT client loop and disconnect  
-client.loop\_stop()  
+
+# Exit the program Loop. 
+except KeyboardInterrupt:
+    print("Exiting program. Good bye")
+
+
+# Send a final command to the JB before we disconnect.
+send_jb_command(exitprog_message)
+
+
+# Stop the MQTT client loop and disconnect
+client.loop_stop()
 client.disconnect()
+
+
 
 ### 3.21 Install the Recommended Python
 
