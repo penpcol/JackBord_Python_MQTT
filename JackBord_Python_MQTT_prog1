@@ -82,6 +82,9 @@ def on_connect(client, userdata, flags, rc):
         # Send a hi command to the JB when we connect
         send_jb_command("hi")
 
+	    # Get the status
+        send_jb_command("vs")
+
     else:
         print(f"Connection failed with code {rc}")
 
