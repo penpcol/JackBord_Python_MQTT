@@ -61,7 +61,9 @@ Paste the code below into the new editor window:
 
 ```python  
 """
-    JackBord_Mqtt_Receiver.py
+    DeepSeek_Version1.py
+
+    This version uses DeepSeek AI Model.
 
     11 March 2025 > This is for use with the JackBord BASIC, PRO or Virtual.
 
@@ -80,6 +82,11 @@ import uuid
 import ssl
 import time
 import re
+
+# Ollama Libraries
+from ollama import chat
+from ollama import ChatResponse
+
 
 
 # MQTT broker configuration >>>>>>>>>
@@ -221,6 +228,28 @@ client.loop_start()
 # Message Counter > Tracks the number of messges we received.
 message_counter = 0
 
+
+# Ask Deepseek a Question >>>>>>>>>>>>
+def ask_deepseek( question ):
+        
+        print (f"ASK DeepSeek Q[{question}]")
+
+        response: ChatResponse = chat(model='deepseek-r1:1.5b', messages=[
+        {
+            'role': 'user',
+            'content': question,
+        },
+        ])
+        
+        # print(response['message']['content'])
+        # or access fields directly from the response object
+        # print(response.message.content)
+
+        # return the anser
+        return(response.message.content)
+
+
+
 # Wait for New MQTT Messages in a loop >>>>>>>>>>
 try:
     while True:
@@ -240,6 +269,12 @@ try:
         # Delay so we dont load the system too much.
         time.sleep(1)
 
+        answer = ask_deepseek('Why is the sky blue?')
+
+        print (f"Answer [{answer}]")
+       
+
+
 
 # Exit the program Loop. >>>>>>>>>>>>>
 except KeyboardInterrupt:
@@ -253,6 +288,8 @@ send_jb_command(exitprog_message)
 # Stop the MQTT client loop and disconnect
 client.loop_stop()
 client.disconnect()
+
+
 
 
 
