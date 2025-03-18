@@ -4,60 +4,8 @@
 
 # 1.0 General
 
-In this exercise we will use the [https://github.com/penpcol/JackBord\_Python\_MQTT](https://github.com/penpcol/JackBord_Python_MQTT) Github repository to use MQTT to interact with the JackBord.
-
-# 2.0 Create the New Repository
-
-![Jack](image1)
-
-# 3.0 Add a Codespace
-
-Now we need to create a codespace to use in the repository.  
-From the repositories main page click the **Code** button.
-
-Next we need to create a codespace for the repository so we can use it.   
-To do this click on the green **Code** button, on the right of the page, and choose the Codespaces tab. 
-
-Then click the … dots menu, shown in the red box. You will see this:
-
-Now select  \+ New with options.
-
-![][image2]
-
-Set the following values:
-
-Branch						Main  
-Region						Leave at default value  
-Machine type  					4-core
-
-**Note:**  You need the 4-core version to run Ollama properly as it has 16G of RAM.
-
-Click **Create** codespace.
-
-It may take some time to get setup but when its done it should look something like this:
-
-![][image3]
-
-By default it shows you the repository Readme file.
-
-## 3.2 Add a New Python Program File
-
-Now we need to add a new Python file to hold our code.   
-When you run your mouse over the explorer on the left you should see these icons at the top appear.
-
-![][image4]
-
-Click on the New File icon shown below:  
-![][image5]  
-Give it a name and press Enter:
-
-![][image6]
-
-On the right you should see a new tab with the filename you provided as its name. This is where we will edit the code.
-
-![][image7]
-
-Paste the code below into the new editor window:
+[PDF version](https://github.com/JackBord_Python_MQTT/blob/main/Using%20MQTT%20With%20the%20JackBord%20from%20Github%20Codespaces.pdf)
+https://github.com/penpcol/JackBord_Python_MQTT/blob/4564defdea83dc3b27a7c50d450b1b9414fa47ac/Using%20MQTT%20With%20the%20JackBord%20from%20Github%20Codespaces.pdf
 
 ```python  
 """
@@ -293,63 +241,3 @@ client.disconnect()
 
 
 
-
-
-
-### 3.21 Install the Recommended Python
-
-When you paste the code into the window you may see a popup like the one below. If you do click **Install**, this installs the required Python extension for Visual Code.
-
-![][image8]  
-When done it should look like this:  
-![][image9]
-
-You can close this window.
-
-## 3.3 Getting Your MQTT Credentials from the Dashboard
-
-Before the program will work you need to get the credentials from the dashboard you are using with your Virtual JackBord.
-
-On the dashboard of your running Virtual JB click the JackBord BASIC icon on the top right.
-
-Once the new browser tab is open look at the URL in the address bar. In our case it was like this:
-
-![][image10]
-
-The information you need for the program is as follows:
-
-jb\_pid \= "your pid"  
-jb\_username \= "your id"  
-jb\_password \= "your pw"
-
-If we fill in the variables based on the URL we got they will look like this (yours will be different):
-
-\# My Virtual JackBord  
-jb\_pid \= "10GT"  
-jb\_username \= "113568327219567611054"  
-jb\_password \= "176642e451"
-
-Note where each of the values resides in the URL.
-
-## 3.4 Installing paho
-
-Next we need to install the paho mqtt library using pip. At the terminal type:
-
-	**pip install paho-mqtt**
-
-Paho will be installed and once done you should see this:
-
-![][image11]
-
-## 3.5 Run the Program
-
-Make sure you have saved the code and then run it by clicking on the **Run ![][image12]** button at the top right of the editor window.
-
-You should see something like this in the terminal:
-
-![][image13]
-
-The program starts by sending hi to the JackBord and it responds with:
-
-Hello from 10GT  
-(c) JackBord Works Ltd
