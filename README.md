@@ -4,7 +4,7 @@
 
 # 1.0 General
 
-[PDF version](https://github.com/JackBord_Python_MQTT/blob/main/Using%20MQTT%20With%20the%20JackBord%20from%20Github%20Codespaces.pdf)
+[PDF version](./Using MQTT With the JackBord from Github Codespaces.pdf)
 https://github.com/penpcol/JackBord_Python_MQTT/blob/4564defdea83dc3b27a7c50d450b1b9414fa47ac/Using%20MQTT%20With%20the%20JackBord%20from%20Github%20Codespaces.pdf
 
 ```python  
